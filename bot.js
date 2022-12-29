@@ -24,6 +24,7 @@ const client = new Client({
     ],
 });
 
+
 client.on('ready', () => {
     console.log('O bot está no ar!');
 });
