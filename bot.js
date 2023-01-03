@@ -38,6 +38,12 @@ const client = new Client({
 });
 
 
+
+
+
+
+
+
 client.on('ready', () => {
     console.log('O bot está no ar!');
 });
@@ -76,6 +82,9 @@ client.on('messageCreate', mensagem => {
 
 
 
+
+
+
 client.on('voiceStateUpdate', (oldState, newState) => {
 
     if (newState.member.roles.cache.some(role => role.name === 'staff')) {
@@ -102,6 +111,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     }
 
 });
+
+
+
+
+
 
 client.on('messageCreate', message => {
   // Verifica se a mensagem é a palavra "tempo"
@@ -144,51 +158,49 @@ client.on('messageCreate', message => {
   
 });
 
-//
 
 
 
-/*
-client.on('voiceStateUpdate', (oldState, newState) => {
-    // Verifica se o usuário entrou em um canal de voz
-    if (oldState.channelId === null && newState.channelId !== null) {
-      // Armazena a hora atual como o momento em que o usuário entrou no canal
-      voiceTime.set(newState.id, Date.now());
-    }
-    // Verifica se o usuário saiu de um canal de voz
-    if (oldState.channelId !== null && newState.channelId === null) {
-      // Calcula o tempo total do usuário no canal
-      const totalTime = Date.now() + voiceTime.get(oldState.id);
-      // Adiciona o tempo total do usuário no canal ao tempo total armazenado
-      const previousTime = voiceTime.get(oldState.id) || 0;
-      voiceTime.set(oldState.id, previousTime + totalTime);
-    }
-  });
-  
-  client.on('messageCreate', message => {
-    // Verifica se a mensagem é a palavra "tempo"
-    if (message.content === 'tempo') {
-      // Busca o tempo total do usuário no mapa
-      const totalTime = voiceTime.get(message.author.id);
-      // Verifica se o usuário já passou tempo em um canal de voz
-      if (totalTime) {
-        // Calcula o tempo em horas, minutos e segundos
-        const hours = Math.floor(totalTime / 1000 / 60 / 60);
-        const minutes = Math.floor((totalTime / 1000 / 60) % 60);
-        const seconds = Math.floor((totalTime / 1000) % 60);
-        // Envia uma mensagem para o canal com o tempo total do usuário
-        message.channel.send(
-          `Você ficou ${hours} horas, ${minutes} minutos e ${seconds} segundos em canais de voz.`
-        );
-      } else {
-        // Envia uma mensagem para o canal informando que o usuário não passou tempo em um canal de voz
-        message.channel.send('Você ainda não passou tempo em um canal de voz.');
-      }
-    }
-  });
-*/
+client.on('messageCreate', message => {
+  // verifique se a mensagem é um comando válido
+  if (message.content.startsWith('!give-role')) {
+    if (message.member.roles.cache.some(role => role.name === 'staff-msg')){
+        // pegue o usuário mencionado e o nome do cargo
+        const words = message.content.split(' ');
+        const user = message.mentions.users.first();
+        const roleName = words.slice(2).join(' '); // o nome do cargo é tudo o que vier depois do usuário mencionado
 
+        // verifique se o usuário e o cargo foram encontrados
+        if (!user || !roleName) {
+        message.channel.send('Usuário ou cargo não encontrados. Verifique se você mencionou o usuário e especificou o nome do cargo corretamente.');
+        return;
+        }
 
+        // verifique se o usuário que enviou o comando tem a permissão para conceder cargos
+        if (message.member.roles.cache.some(role => role.name === 'staff-msg')) {
+        // busque o cargo pelo seu nome
+        const role = message.guild.roles.cache.find(r => r.name === roleName);
+        // conceda o cargo ao usuário
+        message.guild.members.fetch(user).then(member => {
+            if (role) {
+                member.roles.add(role);
+                message.channel.send(`O cargo ${role.name} foi concedido ao usuário ${user.tag}.`);
+            } else {
+                console.error("A variável 'role' é undefined ou nula. Impossível enviar mensagem.");
+                message.channel.send(`Digite somente o nome!`);
+            }
+        }).catch(error => {
+            console.error(error);
+        });
+        //message.channel.send(`O cargo ${role.name} foi concedido ao usuário ${user.tag}.`);
+        } else {
+        message.channel.send('Você não tem permissão para conceder cargos.');
+        }
+  }else{
+    message.channel.send(`Você não tem o cargo staff-msg!`);
+  }
+  }
+});
 
 
 
