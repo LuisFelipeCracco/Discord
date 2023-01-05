@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
 // Cria um mapa para armazenar o tempo total de cada usuário no canal de voz
-const voiceTime = new Map();
-let tempoTotal = null;
+// Cria um objeto para armazenar o tempo de cada usuário
+const voiceTime = {};
 
 
 const client = new Client({
@@ -79,15 +79,69 @@ client.on('messageCreate', mensagem => {
 });
 
 //
+/*
+
+exemplo de map para ajudar:
+// Criamos uma nova instância de Map
+const meuMapa = new Map();
+
+// Adicionamos alguns pares de chave-valor ao mapa
+meuMapa.set('chave1', 'valor1');
+meuMapa.set('chave2', 'valor2');
+meuMapa.set('chave3', 'valor3');
+
+// Podemos verificar se uma chave existe no mapa usando o método has()
+console.log(meuMapa.has('chave1')); // imprime "true"
+console.log(meuMapa.has('chave4')); // imprime "false"
+
+// Podemos recuperar o valor associado a uma chave usando o método get()
+console.log(meuMapa.get('chave1')); // imprime "valor1"
+
+// Podemos remover um par de chave-valor do mapa usando o método delete()
+meuMapa.delete('chave2');
+
+// Podemos percorrer todos os pares de chave-valor no mapa usando o método forEach()
+meuMapa.forEach((valor, chave) => {
+  console.log(`${chave}: ${valor}`);
+});
+// imprime "chave1: valor1" e "chave3: valor3"
+
+caso a opção atual esteja errada, tentar assim ->
 
 
 
 
 
 
-client.on('voiceStateUpdate', (oldState, newState) => {
+// Criamos um mapa para armazenar o tempo de chamada de cada usuário
+const temposDeChamada = new Map();
+
+// Quando um usuário entra em uma chamada, adicionamos ou atualizamos o tempo de chamada dele no mapa
+function registrarTempoDeChamada(idDoUsuario, tempoDeChamada) {
+  if (temposDeChamada.has(idDoUsuario)) {
+    // Se o usuário já estiver no mapa, adicionamos o tempo de chamada dele ao tempo já registrado
+    temposDeChamada.set(idDoUsuario, temposDeChamada.get(idDoUsuario) + tempoDeChamada);
+  } else {
+    // Se o usuário não estiver no mapa, adicionamos ele com o tempo de chamada informado
+    temposDeChamada.set(idDoUsuario, tempoDeChamada);
+  }
+}
+
+// Quando um usuário sai da chamada, podemos recuperar o tempo total de chamada dele usando o método get()
+function obterTempoTotalDeChamada(idDoUsuario) {
+  return temposDeChamada.get(idDoUsuario) || 0;
+}
+
+*/
+
+
+
+/* client.on('voiceStateUpdate', (oldState, newState) => {
 
     if (newState.member.roles.cache.some(role => role.name === 'staff')) {
+
+
+        
 
         // Verifica se o usuário entrou em um canal de voz
         if (oldState.channelId === null && newState.channelId !== null) {
@@ -100,11 +154,14 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         if (oldState.channelId !== null && newState.channelId === null) {
             // Calcula o tempo total do usuário no canal
             console.log("saiu do canal");
-            const totalTime = Date.now() - voiceTime.get(oldState.id);
+            const totalTime = Date.now() - voiceTime.get(oldState.id) ;
+            //let tempoTotal = tempoTotal + totalTime;
             // Armazena o tempo total do usuário no mapa
             voiceTime.set(oldState.id, totalTime);
-            tempoTotal = tempoTotal + totalTime;
+            //tempoTotal = tempoTotal + totalTime;
         }
+
+
 
     }else{
         console.log('não tem')
@@ -139,16 +196,6 @@ client.on('messageCreate', message => {
             // Envia uma mensagem para o canal informando que o usuário não passou tempo em um canal de voz
             message.channel.send('Você ainda não passou tempo em um canal de voz.');
             }
-            if(tempoTotal){
-                // Calcula o tempo em horas, minutos e segundos
-            const hours = Math.floor(tempoTotal / 1000 / 60 / 60);
-            const minutes = Math.floor((tempoTotal / 1000 / 60) % 60);
-            const seconds = Math.floor((tempoTotal / 1000) % 60);
-            // Envia uma mensagem para o canal com o tempo total do usuário
-            message.channel.send(
-                `Você ficou ${hours} horas, ${minutes} minutos e ${seconds} segundos em um canal de voz.`
-            );
-            }
         }
         if(!message.member.roles.cache.some(role => role.name === 'staff')){
             //console.log(`vc não é staff`);
@@ -156,9 +203,100 @@ client.on('messageCreate', message => {
         }
     }//
   
+}); */
+
+//
+
+
+
+//ajuda
+/*
+client.on('voiceStateUpdate', (oldState, newState) => {
+  if (newState.member.roles.cache.some(role => role.name === 'staff')) {
+    // Verifica se o usuário entrou em um canal de voz
+    if (oldState.channelId === null && newState.channelId !== null) {
+      console.log(`o usuario entrou no canal de voz`)
+      // Armazena a hora atual como o momento em que o usuário entrou no canal
+      if (voiceTime[newState.member.id]) {
+        voiceTime[newState.member.id] += Date.now();
+      } else {
+        voiceTime[newState.member.id] = Date.now();
+      }
+    }
+    // Verifica se o usuário saiu de um canal de voz
+    if (oldState.channelId !== null && newState.channelId === null) {
+      // Calcula o tempo total do usuário no canal
+      console.log("saiu do canal");
+      const totalTime = Date.now() - voiceTime[oldState.member.id];
+      // Armazena o tempo total do usuário no objeto
+      voiceTime[oldState.member.id] = totalTime;
+    }
+  } else {
+    console.log('não tem')
+  }
+});
+*/
+
+
+client.on('voiceStateUpdate', (oldState, newState) => {
+  if (newState.member.roles.cache.some(role => role.name === 'staff')) {
+    // Verifica se o usuário entrou em um canal de voz
+    if (oldState.channelId === null && newState.channelId !== null) {
+      console.log(`o usuario entrou no canal de voz`)
+      // Armazena a hora atual como o momento em que o usuário entrou no canal
+      voiceTime[newState.member.id] = Date.now();
+    }
+    // Verifica se o usuário saiu de um canal de voz
+    if (oldState.channelId !== null && newState.channelId === null) {
+      // Calcula o tempo total do usuário no canal
+      console.log("saiu do canal");
+      const totalTime = Date.now() - voiceTime[oldState.member.id];
+      // Armazena o tempo total do usuário no objeto
+      voiceTime[oldState.member.id] = totalTime;
+    }
+  } else {
+    console.log('não tem')
+  }
+});
+
+client.on('messageCreate', message => {
+  // Verifica se a mensagem é a palavra "tempo"
+  if (message.content === 'tempo') {
+    if (message.member.roles.cache.some(role => role.name === 'staff')) {
+      // Busca o tempo total do usuário no objeto
+      const totalTime = voiceTime[message.author.id];
+      console.log(`o usuario ${message.author.id} digitou tempo`)
+      // Verifica se o usuário já passou tempo em um canal de voz
+      if (totalTime) {
+        // Calcula o tempo em horas, minutos e segundos
+        const hours = Math.floor(totalTime / 1000 / 60 / 60);
+        const minutes = Math.floor((totalTime / 1000 / 60) % 60);
+        const seconds = Math.floor((totalTime / 1000) % 60);
+        // Envia uma mensagem para o canal com o tempo total do usuário
+        message.channel.send(
+          `Você ficou ${hours} horas, ${minutes} minutos e ${seconds} segundos em um canal de voz.`
+        );
+      } else {
+        // Envia uma mensagem para o canal informando que o usuário não passou tempo em um canal de voz
+        message.channel.send('Você ainda não passou tempo em um canal de voz.');
+      }
+    }
+    if(!message.member.roles.cache.some(role => role.name === 'staff')){
+        //console.log(`vc não é staff`);
+        message.channel.send(`vc não é staff`);
+    }
+}//
+
 });
 
 
+
+
+
+
+
+
+//
 
 
 client.on('messageCreate', message => {
