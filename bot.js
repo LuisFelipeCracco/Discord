@@ -252,7 +252,8 @@ client.on('voiceStateUpdate', (oldState, newState) => {
       console.log("saiu do canal");
       const totalTime = Date.now() - voiceTime[oldState.member.id];
       // Armazena o tempo total do usuário no objeto
-      voiceTime[oldState.member.id] = totalTime;
+      voiceTime[oldState.member.id] += totalTime;
+      console.log(`${voiceTime[oldState.member.id]} segundosss`);
     }
   } else {
     console.log('não tem')
@@ -269,9 +270,10 @@ client.on('messageCreate', message => {
       // Verifica se o usuário já passou tempo em um canal de voz
       if (totalTime) {
         // Calcula o tempo em horas, minutos e segundos
-        const hours = Math.floor(totalTime / 1000 / 60 / 60);
-        const minutes = Math.floor((totalTime / 1000 / 60) % 60);
-        const seconds = Math.floor((totalTime / 1000) % 60);
+        const totalTimeSeconds = totalTime / 1000;
+        const hours = Math.floor(totalTimeSeconds / 60 / 60);
+        const minutes = Math.floor((totalTimeSeconds / 60) % 60);
+        const seconds = Math.floor(totalTimeSeconds % 60);
         // Envia uma mensagem para o canal com o tempo total do usuário
         message.channel.send(
           `Você ficou ${hours} horas, ${minutes} minutos e ${seconds} segundos em um canal de voz.`

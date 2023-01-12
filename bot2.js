@@ -2,6 +2,7 @@ const { Client, GatewayIntentBits, Partials } = require('discord.js');
 // Cria um mapa para armazenar o tempo total de cada usuário no canal de voz
 const voiceTime = new Map();
 let tempoTotal = null;
+let totalUnico = new Map();
 
 
 const client = new Client({
@@ -104,6 +105,19 @@ client.on('voiceStateUpdate', (oldState, newState) => {
             // Armazena o tempo total do usuário no mapa
             voiceTime.set(oldState.id, totalTime);
             tempoTotal = tempoTotal + totalTime;
+
+            let tempoAtual = totalUnico.get(oldState.id);
+            console.log(`${oldState.id} id do usuariooooo00 ${tempoAtual}`);
+
+            if(tempoAtual === 'undefined' || 'NaN'){
+                totalUnico.set(oldState.id, totalTime);
+            }
+            if(tempoAtual > 1)
+            {
+                totalUnico.set(oldState.id, tempoAtual + totalTime);
+            }
+
+            //totalUnico.set(oldState.id, )
         }
 
     }else{
@@ -148,6 +162,8 @@ client.on('messageCreate', message => {
             message.channel.send(
                 `Você ficou ${hours} horas, ${minutes} minutos e ${seconds} segundos em um canal de voz.`
             );
+            console.log(`${message.author.id} id do usuariooooo`);
+            console.log(`${totalUnico.get(message.author.id)} AQUIAQUIAQUI`);
             }
         }
         if(!message.member.roles.cache.some(role => role.name === 'staff')){
