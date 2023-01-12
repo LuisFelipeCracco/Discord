@@ -153,11 +153,14 @@ client.on('messageCreate', message => {
             // Envia uma mensagem para o canal informando que o usuário não passou tempo em um canal de voz
             message.channel.send('Você ainda não passou tempo em um canal de voz.');
             }
-            if(tempoTotal){
+            if(totalTime){
                 // Calcula o tempo em horas, minutos e segundos
-            const hours = Math.floor(tempoTotal / 1000 / 60 / 60);
-            const minutes = Math.floor((tempoTotal / 1000 / 60) % 60);
-            const seconds = Math.floor((tempoTotal / 1000) % 60);
+            
+            let tempoT = totalUnico.get(message.author.id);
+
+            const hours = Math.floor(tempoT / 1000 / 60 / 60);
+            const minutes = Math.floor((tempoT / 1000 / 60) % 60);
+            const seconds = Math.floor((tempoT / 1000) % 60);
             // Envia uma mensagem para o canal com o tempo total do usuário
             message.channel.send(
                 `Você ficou ${hours} horas, ${minutes} minutos e ${seconds} segundos em um canal de voz.`
